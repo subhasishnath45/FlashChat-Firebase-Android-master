@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -74,7 +75,7 @@ public class MainChatActivity extends AppCompatActivity {
     private void sendMessage() {
 
         // TODO: Grab the text the user typed in and push the message to Firebase
-
+        Toast.makeText(this, "Hello" ,Toast.LENGTH_SHORT ).show();
     }
 
     // TODO: Override the onStart() lifecycle method. Setup the adapter here.
@@ -83,7 +84,7 @@ public class MainChatActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-
+        
         // TODO: Remove the Firebase event listener on the adapter.
 
     }
