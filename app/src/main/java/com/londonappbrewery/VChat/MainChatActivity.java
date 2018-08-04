@@ -1,10 +1,18 @@
 package com.londonappbrewery.VChat;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class MainChatActivity extends AppCompatActivity {
@@ -14,6 +22,7 @@ public class MainChatActivity extends AppCompatActivity {
     private ListView mChatListView;
     private EditText mInputText;
     private ImageButton mSendButton;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +30,10 @@ public class MainChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_chat);
 
         // TODO: Set up the display name and get the Firebase reference
+        setupDisplayName();
+        // initializing mDatabaseReference...
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
 
 
         // Link the Views in the layout to the Java code
@@ -29,14 +42,34 @@ public class MainChatActivity extends AppCompatActivity {
         mChatListView = (ListView) findViewById(R.id.chat_list_view);
 
         // TODO: Send the message when the "enter" button is pressed
-
+        mInputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                    sendMessage();
+                    return true;
+            }
+        });
 
         // TODO: Add an OnClickListener to the sendButton to send a message
-
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
     }
 
     // TODO: Retrieve the display name from the Shared Preferences
-
+    private void setupDisplayName(){
+        // getSharedPreferences(name, mode);
+        // name = String: Desired preferences file. If a preferences file by this name does not exist, it will be created when you retrieve an editor (SharedPreferences.edit()) and then commit changes (Editor.commit()).
+        // mode = 	int: Operating mode. Value is either 0 or combination of MODE_PRIVATE, MODE_WORLD_READABLE, MODE_WORLD_WRITEABLE or MODE_MULTI_PROCESS.
+        SharedPreferences prefs = this.getSharedPreferences(RegisterActivity.CHAT_PREFS,MODE_PRIVATE);
+        mDisplayName = prefs.getString(RegisterActivity.DISPLAY_NAME_KEY,null);
+        if(mDisplayName == null){
+            mDisplayName = "Anonymous";
+        }
+    }
 
     private void sendMessage() {
 

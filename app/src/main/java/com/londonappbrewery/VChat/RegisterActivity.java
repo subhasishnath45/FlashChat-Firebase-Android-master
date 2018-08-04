@@ -111,7 +111,6 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             // TODO: Call create FirebaseUser() here
             createFirebaseUser();
-
         }
     }
 
