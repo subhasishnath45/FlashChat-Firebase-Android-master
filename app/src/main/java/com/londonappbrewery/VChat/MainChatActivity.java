@@ -83,6 +83,13 @@ public class MainChatActivity extends AppCompatActivity {
             // creating InstantMessage instance by calling the parameterized constructor
             // 1st parameter - 
             InstantMessage chat = new InstantMessage(input,mDisplayName);
+            // creating the child node for the database reference
+            // push() - Creates a reference to an auto-generated child location.
+            // setValue(object) = Set the data at this location to the given value( or object).
+            mDatabaseReference.child("messages").push().setValue(chat);
+            // After sending the message I'm making the message input box empty again
+            mInputText.setText("");
+
         }
 
     }
