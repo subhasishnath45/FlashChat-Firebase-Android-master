@@ -37,16 +37,18 @@ public class MainChatActivity extends AppCompatActivity {
 
 
 
+
         // Link the Views in the layout to the Java code
         mInputText = (EditText) findViewById(R.id.messageInput);
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mChatListView = (ListView) findViewById(R.id.chat_list_view);
 
-        // TODO: Send the message when the "enter" button is pressed
+        // TODO: Send the message when the "enter" button of the soft keyboard is pressed
         mInputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                     sendMessage();
+                    // return value to true to indicate that the event actually happened.
                     return true;
             }
         });
@@ -75,7 +77,14 @@ public class MainChatActivity extends AppCompatActivity {
     private void sendMessage() {
 
         // TODO: Grab the text the user typed in and push the message to Firebase
-        Toast.makeText(this, "Hello" ,Toast.LENGTH_SHORT ).show();
+        Toast.makeText(this, "Messege sending..." ,Toast.LENGTH_SHORT ).show();
+        String input = mInputText.getText().toString();
+        if(!input.equals("")){// if input is not empty
+            // creating InstantMessage instance by calling the parameterized constructor
+            // 1st parameter - 
+            InstantMessage chat = new InstantMessage(input,mDisplayName);
+        }
+
     }
 
     // TODO: Override the onStart() lifecycle method. Setup the adapter here.
@@ -84,7 +93,7 @@ public class MainChatActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        
+
         // TODO: Remove the Firebase event listener on the adapter.
 
     }
