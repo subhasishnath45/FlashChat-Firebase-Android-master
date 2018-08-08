@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -22,6 +24,21 @@ public class ChatListAdapter extends BaseAdapter{
     // A DataSnapshot instance contains data from a Firebase Database location.
     // Any time you read Database data, you receive the data as a DataSnapshot.
     private ArrayList<DataSnapshot> mSnapshotlist;
+
+    // creating the constructor.
+    public ChatListAdapter(Activity activity,DatabaseReference ref,String name){
+        mActivity = activity;
+        mDisplayName = name;
+        mDatabaseReference = ref.child("messages");
+        mSnapshotlist = new ArrayList<>();
+    }
+    // helper class for an individual chat row
+    // NB: only nested or inner classes can be static in java********
+    static class ViewHolder{
+        TextView authorName;
+        TextView body;
+        LinearLayout.LayoutParams params;
+    }
 
 // How many items are in the data set represented by this Adapter.
     @Override
