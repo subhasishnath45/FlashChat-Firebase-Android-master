@@ -62,6 +62,9 @@ public class MainChatActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
+        // now we will hook up our adapter with our listView by setAdapter() method...
+        mChatListView.setAdapter(mAdapter);
+
     }
 
     // TODO: Retrieve the display name from the Shared Preferences
