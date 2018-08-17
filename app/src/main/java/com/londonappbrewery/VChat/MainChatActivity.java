@@ -84,7 +84,9 @@ public class MainChatActivity extends AppCompatActivity {
                             @Override
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-
+                                int currentPosition = mAdapter.getCount();
+                                InstantMessage currentMessage = mAdapter.getItem(currentPosition);
+                                deleteSwipedMessage(currentMessage);
                                     mAdapter.mSnapshotlist.remove(position);
                                     mAdapter.notifyDataSetChanged();
 
@@ -93,27 +95,7 @@ public class MainChatActivity extends AppCompatActivity {
                             }
                         });
         mChatListView.setOnTouchListener(touchListener);// deleting the list itself
-        mChatListView.setOnTouchListener(new View.OnTouchListener() {
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
-//                    float initialX, initialY;
-                    case MotionEvent.ACTION_DOWN:
-                        float initialX = event.getX();
-                        float initialY = event.getY();
-
-                        break;
-                    case MotionEvent.ACTION_UP:
-
-                        break;
-
-                }
-//                return super.onTouch(event);
-                return true;
-            }
-        });
 //        int currentPosition = mAdapter.getCount();
 //        InstantMessage currentMessage = mAdapter.getItem(currentPosition);
 //        deleteSwipedMessage(currentMessage);
