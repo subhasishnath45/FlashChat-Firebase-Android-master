@@ -3,7 +3,9 @@ package com.londonappbrewery.VChat;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -45,6 +47,12 @@ public class MainChatActivity extends AppCompatActivity {
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mChatListView = (ListView) findViewById(R.id.chat_list_view);
 
+
+        mAdapter = new ChatListAdapter(this,mDatabaseReference,mDisplayName);
+        // now we will hook up our adapter with our listView by setAdapter() method...
+        mChatListView.setAdapter(mAdapter);
+
+
         // TODO: Send the message when the "enter" button of the soft keyboard is pressed
         mInputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -62,9 +70,53 @@ public class MainChatActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
-        // now we will hook up our adapter with our listView by setAdapter() method...
-        mChatListView.setAdapter(mAdapter);
 
+
+        SwipeDismissListViewTouchListener touchListener =
+                new SwipeDismissListViewTouchListener(
+                        mChatListView,
+                        new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+
+                                    mAdapter.mSnapshotlist.remove(position);
+                                    mAdapter.notifyDataSetChanged();
+
+                                }
+
+                            }
+                        });
+        mChatListView.setOnTouchListener(touchListener);// deleting the list itself
+        mChatListView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+//                    float initialX, initialY;
+                    case MotionEvent.ACTION_DOWN:
+                        float initialX = event.getX();
+                        float initialY = event.getY();
+
+                        break;
+                    case MotionEvent.ACTION_UP:
+
+                        break;
+
+                }
+//                return super.onTouch(event);
+                return true;
+            }
+        });
+//        int currentPosition = mAdapter.getCount();
+//        InstantMessage currentMessage = mAdapter.getItem(currentPosition);
+//        deleteSwipedMessage(currentMessage);
     }
 
     // TODO: Retrieve the display name from the Shared Preferences
@@ -77,6 +129,12 @@ public class MainChatActivity extends AppCompatActivity {
         if(mDisplayName == null){
             mDisplayName = "Anonymous";
         }
+    }
+
+    // method to delete that message from firebase database
+    // as soon as I swipe an item from listView
+    private void deleteSwipedMessage(InstantMessage currentmessage){
+        mDatabaseReference.child(currentmessage.getMessage()).removeValue();
     }
 
     private void sendMessage() {
