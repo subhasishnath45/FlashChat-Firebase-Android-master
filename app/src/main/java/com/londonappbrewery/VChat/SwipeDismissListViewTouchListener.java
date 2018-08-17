@@ -50,7 +50,6 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
 
         boolean canDismiss(int position);
 
-
         void onDismiss(ListView listView, int[] reverseSortedPositions);
     }
 

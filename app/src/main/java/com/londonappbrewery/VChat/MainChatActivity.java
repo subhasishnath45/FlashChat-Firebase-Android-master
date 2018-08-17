@@ -14,8 +14,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
 public class MainChatActivity extends AppCompatActivity {
@@ -28,6 +33,7 @@ public class MainChatActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseReference;
     // creating my adapter member variable
     private ChatListAdapter mAdapter;
+    final ArrayList<String> keyList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,12 +90,11 @@ public class MainChatActivity extends AppCompatActivity {
                             @Override
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                int currentPosition = mAdapter.getCount();
-                                InstantMessage currentMessage = mAdapter.getItem(currentPosition);
-                                deleteSwipedMessage(currentMessage);
                                     mAdapter.mSnapshotlist.remove(position);
                                     mAdapter.notifyDataSetChanged();
 
+                                    mDatabaseReference.getRoot().child("messages").child(keyList.get(position)).removeValue();
+                                    keyList.remove(position);
                                 }
 
                             }
@@ -115,9 +120,10 @@ public class MainChatActivity extends AppCompatActivity {
 
     // method to delete that message from firebase database
     // as soon as I swipe an item from listView
-    private void deleteSwipedMessage(InstantMessage currentmessage){
-        mDatabaseReference.child(currentmessage.getMessage()).removeValue();
-    }
+//    private void deleteSwipedMessage(int position){
+//        InstantMessage currentMessage = mAdapter.getItem(position);
+//        mDatabaseReference.child("messages").push().removeValue(currentMessage);
+//    }
 
     private void sendMessage() {
 
@@ -132,12 +138,26 @@ public class MainChatActivity extends AppCompatActivity {
             // push() - Creates a reference to an auto-generated child location.
             // setValue(object) = Set the data at this location to the given value( or object).
             mDatabaseReference.child("messages").push().setValue(chat);
-            // After sending the message I'm making the message input box empty again
+            mDatabaseReference.child("messages").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot messages : dataSnapshot.getChildren()) {
+                        keyList.add(messages.getKey());
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                /*handle errors*/
+                }
+            });
+                // After sending the message I'm making the message input box empty again
             mInputText.setText("");
 
-        }
+            }
 
-    }
+            ;
+        }
 
     // TODO: Override the onStart() lifecycle method. Setup the adapter here.
 

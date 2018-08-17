@@ -30,6 +30,7 @@ public class ChatListAdapter extends BaseAdapter{
     // A DataSnapshot instance contains data from a Firebase Database location.
     // Any time you read Database data, you receive the data as a DataSnapshot.
     public ArrayList<DataSnapshot> mSnapshotlist;
+    final ArrayList<String> keyList = new ArrayList<>();
 
     // created ChildEventListener type mListener variable as a member variable.
     // and assign a new ChildEventListener object to it
