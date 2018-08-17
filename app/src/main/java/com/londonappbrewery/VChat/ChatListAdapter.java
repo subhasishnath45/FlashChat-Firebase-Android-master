@@ -2,6 +2,8 @@ package com.londonappbrewery.VChat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +11,9 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -27,11 +31,55 @@ public class ChatListAdapter extends BaseAdapter{
     // Any time you read Database data, you receive the data as a DataSnapshot.
         private ArrayList<DataSnapshot> mSnapshotlist;
 
+    // created ChildEventListener type mListener variable as a member variable.
+    // and assign a new ChildEventListener object to it
+    private ChildEventListener mListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        // This method is triggered when a new child is added to the location to which this listener was added.
+        // In our case this method will be triggered when a new chat message is added to the database.
+        // When a new message will be added and this method is triggered, we will recieve a DataSnapShot
+        // The DataSnapShot will contains our newly added chat message data and comes in the JSON format.
+        // we will add the DataSnapShot as a new item of ArrayList<DataSnapshot> mSnapshotlist
+            mSnapshotlist.add(dataSnapshot);
+        // now the dataSnapShot is appended to our arraylist
+        // Now we need to notify the listView to refresh itself, because new information is available
+        notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+// This method is triggered when the data at a child location has changed.
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//            This method is triggered when a child is removed from the location to which this listener
+//            was added.
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//            This method is triggered when a child location's priority changes.
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+//            This method will be triggered in the event that this listener either failed at the server,
+//            or is removed as a result of the security and Firebase rules.
+        }
+    };
+
+
     // creating the constructor.
     public ChatListAdapter(Activity activity,DatabaseReference ref,String name){
         mActivity = activity;
         mDisplayName = name;
         mDatabaseReference = ref.child("messages");
+//        Add a listener for child events occurring at this location.
+//        When child locations are added, removed, changed, or moved,
+//        the listener will be triggered for the appropriate event
+        mDatabaseReference.addChildEventListener(mListener);
         mSnapshotlist = new ArrayList<>();
     }
     // helper class for holding the views for an individual chat row
@@ -46,13 +94,16 @@ public class ChatListAdapter extends BaseAdapter{
 // How many items are in the data set represented by this Adapter.
     @Override
     public int getCount() {
-        return 0;
+        return mSnapshotlist.size();
     }
 // Get the data item associated with the specified position in the data set.
 // The return type of getItem() method can be any object.Here it is - InstantMessage
     @Override
     public InstantMessage getItem(int position) {
-        return null;
+        DataSnapshot snapshot = mSnapshotlist.get(position);
+        // This method is used to convert the data contained in this snapshot into a class of your choosing.
+        InstantMessage message = snapshot.getValue(InstantMessage.class);
+        return message;
     }
 // Get the row id associated with the specified position in the list.
     @Override
@@ -104,4 +155,10 @@ public class ChatListAdapter extends BaseAdapter{
 
         return convertView;
     }
+
+    // this cleanup method will be called from MainChatActivity activity's onStop() method.
+    public void cleanup(){
+        mDatabaseReference.removeEventListener(mListener);
+    }
+
 }
